@@ -4,6 +4,8 @@ import { ActivatedRoute } from '@angular/router';
 import { HousingService } from '../housing.service';
 import { HousingLocation } from '../housinglocation';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormQueryParamService } from '../shared/form-query-param-service.service';
+import { of } from 'rxjs';
 @Component({
   selector: 'app-details',
   standalone: true,
@@ -56,9 +58,11 @@ export class DetailsComponent {
     email: new FormControl('')
   });
 
-  constructor() {
+  constructor(private formQueryParmService: FormQueryParamService) {
     const housingLocationId = parseInt(this.route.snapshot.params['id'], 10);
     this.housingLocation = this.housingService.getHousingLocationById(housingLocationId);
+
+    this.formQueryParmService.initializeFormChangesAsQueryParam({form: this.applyForm, unsubscribe$: of()})
   }
   submitApplication() {
     this.housingService.submitApplication(
