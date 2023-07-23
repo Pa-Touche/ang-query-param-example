@@ -7,9 +7,10 @@ Can be used per example for search forms, to allow a user to share it's url, or 
 
 ## Enhancements 
 
-- Add type information (which convention should be used?)
+- ❌ Add type information (which convention should be used?)
     - [bool]true,[date]2023-0719
     - [b|d]val
     - other ?
-- Tests...
+- ❌ Current leafKeyValue pair extractions 
+- ❌ Tests...
 
