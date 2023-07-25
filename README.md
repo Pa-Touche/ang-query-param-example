@@ -11,5 +11,8 @@ Can be used per example for search forms, to allow a user to share it's url, or 
     - [bool]true,[date]2023-0719
     - [b|d]val
     - other ?
-- ❌ Tests...
+- ❌ Tests
+    - ✅ utils functions
+    - ❌ abstract control observable piping
+    - ❌ FormQueryParamService testing with mocking router route.
 
