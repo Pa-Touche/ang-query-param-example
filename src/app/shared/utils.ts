@@ -5,13 +5,16 @@
  */
 export function exctractLeafProperties(obj: Record<string, any>): string[] {
     return getLeafValuePairs(obj).map((keyValuePair) => keyValuePair[0]);
-  }
+}
+
 
 export function getLeafValuePairs(obj: Record<string, any>): [string, any][] {
     let keyValuePairs: [string, any][] = [];
     for (const key in obj) {
         const objValue = obj[key];
-        if (typeof objValue === 'object') {
+        if (Array.isArray(objValue)) {
+            keyValuePairs.push([key, objValue])
+        } else if (typeof objValue === 'object') {
             const keysOfCurrentObj = exctractLeafProperties(objValue);
             keyValuePairs = keyValuePairs.concat(
                 keysOfCurrentObj.map(function (subKey) {
@@ -90,8 +93,8 @@ export function arrFalsyRemover(arr: any) {
     if (arr.length === 0 || (!isObj(arr[0]) && !Array.isArray(arr[0]))) {
         return arr;
     }
-    
-    const mappingFct = isObj(arr[0]) ? (val: any) => falsyRemover(val) : (val: any) => arrFalsyRemover(val); 
+
+    const mappingFct = isObj(arr[0]) ? (val: any) => falsyRemover(val) : (val: any) => arrFalsyRemover(val);
 
 
     return arr.map(mappingFct);
@@ -100,3 +103,17 @@ export function arrFalsyRemover(arr: any) {
 export function isObj(candidate: any) {
     return typeof candidate === 'object' && !Array.isArray(candidate);
 }
+
+
+function keyValuePairsToObject(keyValuePairs: [string, any][]) {
+    return keyValuePairs.reduce((acc, currrent) => {
+      const currentKey = currrent[0]
+      const currentValue = currrent[1]
+  
+      const keySplit = currentKey.split(".")
+  
+      // not ready yet keySplit.slice(0,-1).forEach()
+  
+      return acc;
+    }, {})
+  }
