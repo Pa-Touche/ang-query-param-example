@@ -10,7 +10,7 @@ Can be used per example for search forms, to allow a user to share it's url, or 
 - ❌ Add type information (which convention should be used?)
     - [bool]true,[date]2023-0719
     - [b|d]val
-    - other ?
+    - other ?git 
 - ❌ Tests
     - ✅ utils functions
     - ❌ abstract control observable piping
