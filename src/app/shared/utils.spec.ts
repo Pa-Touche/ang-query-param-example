@@ -1,4 +1,4 @@
-import { exctractLeafProperties, getLeafValuePairs } from "./utils";
+import { exctractLeafProperties, getLeafValuePairs, keyValuePairsToObject } from "./utils";
 
 
 describe('exctractLeafProperties', () => {
@@ -141,3 +141,29 @@ describe('getLeafValuePairs', () => {
   });
 });
 
+
+describe('keyValuePairsToObject', () => {
+
+
+  it('should handle nested properties, arrays and booleans', () => {
+    const keyValuePairs = [
+      ['a', 'value1'],
+      ['b.c', 'value2'],
+      ['b.d.e', 'value3'],
+      ['f', [1, 2, 3]],
+      ['g', true]
+    ];
+
+    // not quite sure why typing is broken ?
+    const result = keyValuePairsToObject(keyValuePairs as any);
+
+    expect(result).toEqual(
+      {
+        a: 'value1',
+        b: { c: 'value2', d: { e: 'value3' } },
+        f: [ 1, 2, 3 ],
+        g: true
+      }
+    );
+  });
+});

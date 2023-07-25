@@ -105,15 +105,33 @@ export function isObj(candidate: any) {
 }
 
 
-function keyValuePairsToObject(keyValuePairs: [string, any][]) {
-    return keyValuePairs.reduce((acc, currrent) => {
-      const currentKey = currrent[0]
-      const currentValue = currrent[1]
-  
-      const keySplit = currentKey.split(".")
-  
-      // not ready yet keySplit.slice(0,-1).forEach()
-  
-      return acc;
+export function keyValuePairsToObject(keyValuePairs: [string, any][]) {
+    return keyValuePairs.reduce((acc: any, currrent) => {
+
+        const currentKey = currrent[0]
+        const currentValue = currrent[1]
+
+        const keySplit = currentKey.split(".")
+
+        const leafKey = keySplit[keySplit.length - 1];
+
+
+        if (keySplit.length === 1) {
+            acc[leafKey] = currentValue;
+
+            return acc;
+        }
+
+        let currentSelf: any = acc;
+
+        keySplit.slice(0, -1).forEach(key => {
+            currentSelf[key] = currentSelf[key] || {};
+
+            currentSelf = currentSelf[key]
+        })
+
+        currentSelf[leafKey] = currentValue
+
+        return acc;
     }, {})
-  }
+}
