@@ -1,21 +1,20 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup } from '@angular/forms';
-import { startWith, take, takeUntil } from 'rxjs/operators';
-import { Observable, ObservableInput, Subject } from 'rxjs';
-import { falsyRemover, getLeafValuePairs } from './utils';
+import { map, startWith, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { Observable, ObservableInput, Subject, of } from 'rxjs';
+import { falsyRemover, getLeafValuePairs, objectWithNestedPropertzToNestedObject } from './utils';
 import { throttledControlValueChange } from './abstract-control';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FormQueryParamService {
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
-  initializeFormChangesAsQueryParam(param: {form: FormGroup; unsubscribe$: ObservableInput<void>}) {
+  initializeFormChangesAsQueryParam(param: { form: FormGroup; unsubscribe$: ObservableInput<void> }) {
     const form = param.form;
     throttledControlValueChange(form)
-      .pipe(startWith(form.value))
       .pipe(takeUntil(param.unsubscribe$))
       .subscribe((changedValue: Record<string, any>) => {
         const onlyValidValues = falsyRemover(changedValue);
@@ -27,15 +26,36 @@ export class FormQueryParamService {
           return previousValue;
         }, {});
 
-        this.router.navigate([], {queryParams: leafTuples});
+        this.router.navigate([], { queryParams: leafTuples });
       });
   }
 
-  extractQueryParams(activatedRoute: ActivatedRoute): Observable<object> {
+  extractQueryParams(param: { activatedRoute: ActivatedRoute }): Observable<object> {
     // TODO: arrays
     // TODO: boolean
     // TODO: dates ?
     // TODO: anything else ?
-    return activatedRoute.queryParams.pipe(take(1));
+    return this.extractObjectFromQueryParams(param.activatedRoute);
   }
+
+  applyQueryParams(param: { activatedRoute: ActivatedRoute, form: FormGroup }): Observable<void> {
+    // TODO: arrays
+    // TODO: boolean
+    // TODO: dates ?
+    // TODO: anything else ?
+    return this.extractObjectFromQueryParams(param.activatedRoute).pipe(
+      tap(value => {
+        // if event is produced, fields that are not present will be removed (see observable)
+        param.form.patchValue(value, { emitEvent: false })
+      }),
+      switchMap(params => of()))
+  }
+
+  private extractObjectFromQueryParams(activatedRoute: ActivatedRoute): Observable<Record<string, any>> {
+    return activatedRoute.queryParams.pipe(
+      take(1),
+      map(value => objectWithNestedPropertzToNestedObject(value))
+      );
+  }
+
 }

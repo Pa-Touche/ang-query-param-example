@@ -107,3 +107,7 @@ export function keyValuePairsToObject(keyValuePairs: [string, any][]): Record<st
         return acc;
     }, {});
 }
+
+export function objectWithNestedPropertzToNestedObject(keyValuePairs: object): Record<string, any> {
+    return keyValuePairsToObject(Object.entries(keyValuePairs));
+}

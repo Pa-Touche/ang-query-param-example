@@ -15,7 +15,7 @@ export function throttledControlValueChange(control: AbstractControl, options?: 
 
     const actualChangeComparator: (x: any, y: any) => boolean = options?.changeDetectionPredicate || defaultComparisonPredicate();
 
-    const actualDebounceTimeMillis = options?.throttleMillis || 150;
+    const actualDebounceTimeMillis = options?.throttleMillis || 300;
 
     return control.valueChanges
         .pipe(debounceTime(actualDebounceTimeMillis))
