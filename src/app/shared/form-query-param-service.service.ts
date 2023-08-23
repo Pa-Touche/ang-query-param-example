@@ -31,18 +31,11 @@ export class FormQueryParamService {
   }
 
   extractQueryParams(param: { activatedRoute: ActivatedRoute }): Observable<object> {
-    // TODO: arrays
-    // TODO: boolean
-    // TODO: dates ?
-    // TODO: anything else ?
     return this.extractObjectFromQueryParams(param.activatedRoute);
   }
 
   applyQueryParams(param: { activatedRoute: ActivatedRoute, form: FormGroup }): Observable<void> {
-    // TODO: arrays
-    // TODO: boolean
-    // TODO: dates ?
-    // TODO: anything else ?
+
     return this.extractObjectFromQueryParams(param.activatedRoute).pipe(
       tap(value => {
         // if event is produced, fields that are not present will be removed (see observable)
@@ -52,6 +45,10 @@ export class FormQueryParamService {
   }
 
   private extractObjectFromQueryParams(activatedRoute: ActivatedRoute): Observable<Record<string, any>> {
+        // TODO: arrays
+    // TODO: boolean
+    // TODO: dates ?
+    // TODO: anything else ?
     return activatedRoute.queryParams.pipe(
       take(1),
       map(value => objectWithNestedPropertzToNestedObject(value))
