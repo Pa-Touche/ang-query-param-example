@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { HousingService } from '../housing.service';
@@ -47,7 +47,7 @@ import { of } from 'rxjs';
   `,
   styleUrls: ['./details.component.css'],
 })
-export class DetailsComponent {
+export class DetailsComponent implements OnInit {
 
   route: ActivatedRoute = inject(ActivatedRoute);
   housingService = inject(HousingService);
@@ -58,12 +58,21 @@ export class DetailsComponent {
     email: new FormControl('')
   });
 
-  constructor(private formQueryParmService: FormQueryParamService) {
+  constructor(
+    private formQueryParmService: FormQueryParamService,
+    private activatedRoute: ActivatedRoute
+    ) {
     const housingLocationId = parseInt(this.route.snapshot.params['id'], 10);
     this.housingLocation = this.housingService.getHousingLocationById(housingLocationId);
 
     this.formQueryParmService.initializeFormChangesAsQueryParam({form: this.applyForm, unsubscribe$: of()})
   }
+
+  ngOnInit(): void {
+    this.formQueryParmService.applyQueryParams({activatedRoute: this.activatedRoute, form: this.applyForm})
+    .subscribe()
+  }
+
   submitApplication() {
     this.housingService.submitApplication(
       this.applyForm.value.firstName ?? '',

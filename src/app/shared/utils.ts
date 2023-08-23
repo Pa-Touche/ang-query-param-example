@@ -9,31 +9,19 @@ export function exctractLeafProperties(obj: Record<string, any>): string[] {
 
 
 export function getLeafValuePairs(obj: Record<string, any>): [string, any][] {
-    let keyValuePairs: [string, any][] = [];
-    for (const key in obj) {
-        const objValue = obj[key];
+    return Object.entries(obj).flatMap(([key, objValue]) => {
         if (Array.isArray(objValue)) {
-            keyValuePairs.push([key, objValue])
-        } else if (typeof objValue === 'object') {
-            const keysOfCurrentObj = exctractLeafProperties(objValue);
-            keyValuePairs = keyValuePairs.concat(
-                keysOfCurrentObj.map(function (subKey) {
-                    const nestedKey = `${key}.${subKey}`;
-                    return [nestedKey, extractNestedProperty(obj, nestedKey)];
-                })
-            );
+            return [[key, objValue]];
+        } else if (typeof objValue === 'object' && objValue !== null) {
+            return getLeafValuePairs(objValue).map(([subKey, nestedValue]) => {
+                const nestedKey = `${key}.${subKey}`;
+                return [nestedKey, nestedValue] as [string, any];
+            });
         } else {
-            keyValuePairs.push([key, objValue]);
+            return [[key, objValue]];
         }
-    }
-    return keyValuePairs;
+    });
 }
-
-
-export function extractNestedProperty(obj: any, nestedPropertyKey: string): any | undefined {
-    return nestedPropertyKey?.split('.').reduce((o, k) => (o ? o[k] : undefined), obj);
-}
-
 
 
 /**
@@ -105,33 +93,21 @@ export function isObj(candidate: any) {
 }
 
 
-export function keyValuePairsToObject(keyValuePairs: [string, any][]) {
-    return keyValuePairs.reduce((acc: any, currrent) => {
+export function keyValuePairsToObject(keyValuePairs: [string, any][]): Record<string, any> {
+    return keyValuePairs.reduce((acc: Record<string, any>, [currentKey, currentValue]) => {
+        const keySplit = currentKey.split(".");
+        const leafKey = keySplit.pop()!;
 
-        const currentKey = currrent[0]
-        const currentValue = currrent[1]
+        const parent = keySplit.reduce((nestedObj, key) => {
+            nestedObj[key] = nestedObj[key] || {};
+            return nestedObj[key];
+        }, acc);
 
-        const keySplit = currentKey.split(".")
-
-        const leafKey = keySplit[keySplit.length - 1];
-
-
-        if (keySplit.length === 1) {
-            acc[leafKey] = currentValue;
-
-            return acc;
-        }
-
-        let currentSelf: any = acc;
-
-        keySplit.slice(0, -1).forEach(key => {
-            currentSelf[key] = currentSelf[key] || {};
-
-            currentSelf = currentSelf[key]
-        })
-
-        currentSelf[leafKey] = currentValue
-
+        parent[leafKey] = currentValue;
         return acc;
-    }, {})
+    }, {});
+}
+
+export function objectWithNestedPropertzToNestedObject(keyValuePairs: object): Record<string, any> {
+    return keyValuePairsToObject(Object.entries(keyValuePairs));
 }

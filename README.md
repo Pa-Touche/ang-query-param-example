@@ -11,8 +11,10 @@ Can be used per example for search forms, to allow a user to share it's url, or 
     - [bool]true,[date]2023-0719
     - [b|d]val
     - other ?
+- ❌ Add nested formGroups to test this part
+- ❌ Unsubscribe of observables ? Simple way could be to create observable on angular lifecycle "on destroy"
 - ❌ Tests
     - ✅ utils functions
-    - ❌ abstract control observable piping
+    - ✅ abstract control observable piping
     - ❌ FormQueryParamService testing with mocking router route.
 
