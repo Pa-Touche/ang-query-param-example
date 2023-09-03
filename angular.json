@@ -11,7 +11,7 @@
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
-          "options": {
+          "opt1ions": {
             "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
