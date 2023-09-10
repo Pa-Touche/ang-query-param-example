@@ -1,11 +1,14 @@
 
+interface AngularRouting {
+    component: any;
+    routes?: AngularRouting[];
+    path?: string;
+}
 
-/* 
-Route check works so far but: 
-
-- Not recursive (must be checked against 'children routes' also)
-
-*/
+interface RoutingDuplicate {
+    path: string;
+    parentPath?: string;
+}
 
 const routesWithCollisionAtFirstLevel = [
     {
@@ -25,6 +28,30 @@ const routesWithCollisionAtFirstLevel = [
         path: '',
         component: {} as any,
         title: 'Home page'
+    },
+    {
+        path: 'tasks',
+        component: {} as any,
+        title: 'Home page',
+        routes: [
+            {
+                path: 'details/:id',
+                component: {} as any,
+                title: 'Home details'
+            },
+            {
+                path: 'details/:anotherIdName',
+                component: {} as any,
+                title: 'Home details',
+                routes: [
+                    {
+                        path: 'details/:id',
+                        component: {} as any,
+                        title: 'Home details'
+                    },
+                ]
+            }
+        ]
     },
     {
         path: 'sameEntry',
@@ -47,31 +74,37 @@ const routesWithCollisionAtFirstLevel = [
         title: 'Home details'
     }
 ];
-/* 
-describe('checkRouting', () => {
-    it('No collisions (same variable paths, different variable names)', () => { */
 
-const routeElements = routesWithCollisionAtFirstLevel
-    .map(entry => entry.path)
-    // replacing falsy with default (check TS-Doc)
-    .map(path => path ?? "/")
-    .map(path => ({ originalPath: path, normalizedPath: normalizePath(path as any) }));
+console.log(findDuplicates(routesWithCollisionAtFirstLevel))
 
-console.log(routeElements)
+type ReursiveRoutingDuplicateArray = (RoutingDuplicate | ReursiveRoutingDuplicateArray)[];
 
-const cache: { [key: string]: boolean } = {};
-const duplicateRoutes = [];
-for (var i = 0, len = routeElements.length; i < len; i++) {
-    const normalizedPath = routeElements[i].normalizedPath;
-    const originalPath = routeElements[i].originalPath;
-    if (cache[normalizedPath] === true) {
-        duplicateRoutes.push(originalPath);
-    } else {
-        cache[normalizedPath] = true;
+function findDuplicates(routingEntries: AngularRouting[], parentPath?: string): ReursiveRoutingDuplicateArray {
+    const routeElements = routingEntries
+        .map(entry => entry.path)
+        // replacing falsy with default (check TS-Doc)
+        .map(path => path ?? "/")
+        .map(path => ({ originalPath: path, normalizedPath: normalizePath(path) }));
+
+
+    const cache: { [key: string]: boolean } = {};
+    const duplicateRoutes: RoutingDuplicate[] = [];
+    for (var i = 0, len = routeElements.length; i < len; i++) {
+        const normalizedPath = routeElements[i].normalizedPath;
+        const originalPath = routeElements[i].originalPath;
+        if (cache[normalizedPath] === true) {
+            duplicateRoutes.push({ path: originalPath, ...(parentPath && { parentPath }) });
+        } else {    
+            cache[normalizedPath] = true;
+        }
     }
-}
 
-/* }); */
+    return [...duplicateRoutes, ...routingEntries
+        .filter(a => a.routes?.length)
+        .flatMap(a => ({parentPath: a.path ?? '/', routes: a.routes ?? []}))
+        .map(a => findDuplicates(a.routes, a.parentPath))]
+        .filter(a => !Array.isArray(a) || a.length);
+}
 
 
 function normalizePath(path: string): string {
