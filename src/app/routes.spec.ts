@@ -45,9 +45,21 @@ const routesWithCollisionAtFirstLevel = [
                 title: 'Home details',
                 routes: [
                     {
-                        path: 'details/:id',
+                        path: 'taskDetails/:id',
                         component: {} as any,
-                        title: 'Home details'
+                        title: 'Home details',
+                        routes: [
+                            {
+                                path: 'TaskDetailsDetails/:id',
+                                component: {} as any,
+                                title: 'Home details'
+                            },
+                            {
+                                path: 'TaskDetailsDetails/:id',
+                                component: {} as any,
+                                title: 'Home details'
+                            },
+                        ]
                     },
                 ]
             }
@@ -102,7 +114,7 @@ function findDuplicates(routingEntries: AngularRouting[], parentPath?: string): 
     return [...duplicateRoutes, ...routingEntries
         .filter(a => a.routes?.length)
         .flatMap(a => ({parentPath: a.path ?? '/', routes: a.routes ?? []}))
-        .map(a => findDuplicates(a.routes, a.parentPath))]
+        .flatMap(a => findDuplicates(a.routes, a.parentPath))]
         .filter(a => !Array.isArray(a) || a.length);
 }
 
